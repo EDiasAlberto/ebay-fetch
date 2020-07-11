@@ -1,3 +1,9 @@
+TO DO LIST:
+1) Create a GUI
+2) Tighten up and make the program clean
+3) Comment my code
+4) Create functions rather than just having code running
+
 To use this app, fill out the name and cost price for each item in the outputFile.csv
 Then, create a file called ebay.yaml
 IN ebay.yaml:

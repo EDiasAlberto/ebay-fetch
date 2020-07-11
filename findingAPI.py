@@ -22,27 +22,6 @@ class ebayListingItem:
     def printInfo(self):
         print(self.name, self.cost, self.postage, self.packaging, self.actual, self.ebay, self.paypal, self.minimum, self.active, self.profit, self.initStock, self.soldStock, self.inStock)
 
-'''
-findingApi = Finding(config_file = "ebay.yaml", siteid = "EBAY-GB")
-
-requests ={
-        "itemFilter": [
-            {"name" : "Condition", "value" : "New"},
-            {"name" : "Seller", "value" : "angelone4"}
-        ],
-        "paginationInput" : {
-            "entriesPerPage" : 100,
-            #"pageNumber" : 1 Normally shows which page will be printed
-            #Default value is 1 so this is unnecessary.
-        },
-        "sortOrder": "PricePlusShippingLowest"
-}
-
-response = findingApi.execute("findItemsAdvanced",requests)
-
-for item in response.reply.searchResult.item:
-    print(item.title, item.sellingStatus.currentPrice.value, item)
-'''
 
 outputFile=open("outputFile.csv", "r")
 tradingApi = Trading(config_file = "ebay.yaml", site ="api.sandbox.ebay.com")

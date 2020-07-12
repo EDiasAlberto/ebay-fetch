@@ -1,6 +1,5 @@
 from ebaysdk.finding import Connection as Finding
 from ebaysdk.trading import Connection as Trading
-from decimal import Decimal
 
 counter=0
 fetchedListings=[]
@@ -95,7 +94,10 @@ ebayObjects=sorted(ebayObjects, key = lambda x:x.name)
     #print("%-100s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-15s %-15s %-15s %-15s \n"%(x.name, x.cost, x.postage, x.packaging, x.ebay, x.paypal, x.minimum, x.actual, x.profit, x.initStock, x.soldStock, x.inStock))
 
 outputFile=open("outputFile2.csv", "w")
-outputFile.write("Name, Cost, Postage, Package, EBay, PayPal, Minimum, Actual, Profit, Initial Stock, Sold Stock, In Stock\n")
+outputFile.write("Name, Cost, Postage, Package, EBay, PayPal, Minimum, Actual, Profit, Initial Stock, Sold Stock, In Stock, Active\n")
 for x in ebayObjects:
-    outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}\n")
+    if x.initStock>0:
+        outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, True\n")
+    else:
+        outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, False\n")
 outputFile.close()

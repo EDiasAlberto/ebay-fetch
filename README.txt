@@ -5,6 +5,8 @@ TO DO LIST:
 4) Create functions rather than just having code running
 
 To use this app, fill out the name and cost price for each item in the outputFile.csv
+or skip to step 2 then fill out the prompts from the program
+
 Then, create a file called ebay.yaml
 IN ebay.yaml:
 	name: ebay_api_config

@@ -3,6 +3,7 @@ from ebaysdk.trading import Connection as Trading
 import tkinter
 import random
 import time
+from tkinter import messagebox
 
 
 #This creates a few empty lists that are used for comparisons later on.
@@ -89,6 +90,20 @@ def createListingObjects():
                 ebayObjects.append(ebayListingItem(x[0], y[1], 3.70, x[1], initStock=x[2], inStock=x[3]))
     newItemDetection()
 
+#This function writes all the data in rows and columns to the csv file so it can be opened in Excel.
+def writeData():
+    global ebayObjects
+    ebayObjects=sorted(ebayObjects, key= lambda x:x.name)
+    outputFile=open("outputFile2.csv", "w")
+    outputFile.write("Name, Cost, Postage, Package, EBay, PayPal, Minimum, Actual, Profit, Initial Stock, Sold Stock, In Stock, Active\n")
+    for x in ebayObjects:
+        if x.initStock>0:
+            outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, True\n")
+        else:
+            outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, False\n")
+    outputFile.close()
+
+#This function is used by the button on the new item detection window, where it fetches the entered cost and also creates a new listing object.
 def appendListing(item, value):
     for z in range(len(fetchedListings)):
         if item == fetchedListings[z]:
@@ -106,12 +121,8 @@ def newItemDetection():
     global mainWindow
     global tkinterVar
 
-
     mainWindow.destroy()
-    tkinterVar = tkinter.BooleanVar(mainWindow, value=False)
-    tkinterVar.set(True)
-
-
+    
     for x in fetchedListings:
         fetchedNames.append(x[0])
 
@@ -120,31 +131,29 @@ def newItemDetection():
 
     for x in fetchedNames:
         if x not in existingNames:
-            mainWindow=tkinter.Tk()
-            mainWindow.title("NEW ITEM DETECTED!")
-            tkinter.Label(mainWindow, text=f"Please enter the cost of {x}:", font="Helvetica 12").grid(row=0, columnspan=2)
-            tkinter.Label(mainWindow, text="£").grid(row=1, column=0)
-            priceEntry=tkinter.Entry(mainWindow)
-            priceEntry.grid(row=1, column=1)
-            button=tkinter.Button(mainWindow, text="Enter", fg="green", font="Helvetica 12", command=lambda:[appendListing(x, priceEntry.get()), tkinterVar.set(1)])
-            button.grid(row=2, columnspan=2)
-            mainWindow.wait_variable(tkinterVar)
+            try:
+                mainWindow=tkinter.Tk()
+                tkinterVar = tkinter.BooleanVar(mainWindow, value=False)
+                tkinterVar.set(True)
+                mainWindow.title("NEW ITEM DETECTED!")
+                tkinter.Label(mainWindow, text=f"Please enter the cost of {x}:", font="Helvetica 12").grid(row=0, columnspan=2)
+                tkinter.Label(mainWindow, text="£").grid(row=1, column=0)
+                priceEntry=tkinter.Entry(mainWindow)
+                priceEntry.grid(row=1, column=1)
+                button=tkinter.Button(mainWindow, text="Enter", fg="green", font="Helvetica 12", command=lambda:[appendListing(x, priceEntry.get()), tkinterVar.set(1)])
+                button.grid(row=2, columnspan=2)
+                mainWindow.wait_variable(tkinterVar)
+                mainWindow.destroy()
+            except ValueError:
+                messagebox.showinfo(title="Invalid input", message="The cost cannot be left empty.")
 
+    writeData()
     mainWindow=tkinter.Tk()
     mainWindow.title("Ebay Fetch")
     tkinter.Label(mainWindow, text="All data has been fetched from the website.", font="Helvetica 12").pack()
     tkinter.Button(mainWindow, text="Main Menu", fg="red", font="Helvetica 12", command=lambda :main(True)).pack()
 
-#This function writes all the data in rows and columns to the csv file so it can be opened in Excel.
-def writeData():
-    outputFile=open("outputFile2.csv", "w")
-    outputFile.write("Name, Cost, Postage, Package, EBay, PayPal, Minimum, Actual, Profit, Initial Stock, Sold Stock, In Stock, Active\n")
-    for x in ebayObjects:
-        if x.initStock>0:
-            outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, True\n")
-        else:
-            outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, False\n")
-    outputFile.close()
+
 
 def main(returnCheck=False):
     global mainWindow

@@ -1,8 +1,6 @@
 TO DO LIST:
-1) Create a GUI
-2) Tighten up and make the program clean
-3) Comment my code
-4) Create functions rather than just having code running
+1) Tighten up and make the program clean
+2) Add a function to confirm price changes
 
 To use this app, fill out the name and cost price for each item in the outputFile.csv
 or skip to step 2 then fill out the prompts from the program

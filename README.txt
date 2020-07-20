@@ -5,8 +5,13 @@ TO DO LIST:
 To use this app, fill out the name and cost price for each item in the outputFile.csv
 or skip to step 2 then fill out the prompts from the program
 
+Run the "downloadPython.bat" by double-clicking it, which will download a ".exe" file.
+Run the .exe, ensuring that you tick the checkbox "Add Python 3.8.4 to PATH" on the first screen.
+Follow through the installation.
+Run the "install.bat" by double-clicking it, which will install the ebaysdk for python.
+
 Then, create a file called ebay.yaml
-IN ebay.yaml:
+Paste the following into the file:
 	name: ebay_api_config
 
 	# Trading API Sandbox - https://www.x.com/developers/ebay/products/trading-api
@@ -32,3 +37,8 @@ IN ebay.yaml:
 	# Shopping API - https://www.x.com/developers/ebay/products/shopping-api
 	open.api.ebay.com:
 		appid: YOUR_APP_ID
+
+Create an account and app on the ebay developer page. For the trading api (not the sandbox), copy your details into this file,
+where the "#Trading API - ..." line is.
+
+Double-click the "run.bat" to run the program.

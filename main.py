@@ -45,12 +45,15 @@ def loadFileData():
     mainWindow.geometry("300x200")
     tkinter.Label(mainWindow, text="Fetching Data...", font="Helvetica 12").pack()
 
-    outputFile=open("outputFile2.csv", "r")
+    #This loads data in from the csv file.
+    outputFile=open("outputFile.csv", "r")
     line = outputFile.readline()
     while line!="":
         existingData.append(line.strip(",\n").split(","))
         line=outputFile.readline()
     outputFile.close()
+
+    #This runs the next function that loads data from the ebay site.
     loadSiteData()
 
 #This is a function that loads all the data from teh listings on the site into a list called "fetchedListings".
@@ -66,6 +69,8 @@ def loadSiteData():
     for x in results.reply.ActiveList.ItemArray.Item:
         #print(f'Item name: {x.Title} Item price: £{x.SellingStatus.CurrentPrice.value} Initial Stock: {x.Quantity} Stock Remaining: {x.QuantityAvailable} Sold Stock {int(x.Quantity)-int(x.QuantityAvailable)}')
         fetchedListings.append([x.Title, x.SellingStatus.CurrentPrice.value, x.Quantity, x.QuantityAvailable, int(x.Quantity)-int(x.QuantityAvailable)])
+
+    #This tidies up the loaded data and removes any unnecessary parts.
     tidyData()
 
 #This is a function that removes all listings that are not in stock.
@@ -79,6 +84,8 @@ def tidyData():
     for x in modifiedExistingData:
         for y in range(len(x)):
             x[y]=x[y].replace("Â£","")
+
+    #This creates the listing objects usign the ebayObjects class.
     createListingObjects()
 
 #This then calculates and creates objects using the class above of each listing.
@@ -88,13 +95,15 @@ def createListingObjects():
         for y in modifiedExistingData:
             if x[0]==y[0]:
                 ebayObjects.append(ebayListingItem(x[0], y[1], 3.70, x[1], initStock=x[2], inStock=x[3]))
+
+    #This runs the function that checks for any new products that have been loaded from the website.
     newItemDetection()
 
 #This function writes all the data in rows and columns to the csv file so it can be opened in Excel.
 def writeData():
     global ebayObjects
     ebayObjects=sorted(ebayObjects, key= lambda x:x.name)
-    outputFile=open("outputFile2.csv", "w")
+    outputFile=open("outputFile.csv", "w")
     outputFile.write("Name, Cost, Postage, Package, EBay, PayPal, Minimum, Actual, Profit, Initial Stock, Sold Stock, In Stock, Active\n")
     for x in ebayObjects:
         if x.initStock>0:
@@ -122,7 +131,7 @@ def newItemDetection():
     global tkinterVar
 
     mainWindow.destroy()
-    
+
     for x in fetchedListings:
         fetchedNames.append(x[0])
 
@@ -136,10 +145,10 @@ def newItemDetection():
                 tkinterVar = tkinter.BooleanVar(mainWindow, value=False)
                 tkinterVar.set(True)
                 mainWindow.title("NEW ITEM DETECTED!")
-                tkinter.Label(mainWindow, text=f"Please enter the cost of {x}:", font="Helvetica 12").grid(row=0, columnspan=2)
-                tkinter.Label(mainWindow, text="£").grid(row=1, column=0)
+                tkinter.Label(mainWindow, text=f"Please enter the cost of {x}:", font="Helvetica 12").grid(row=0, columnspan=2, sticky="NSEW")
+                tkinter.Label(mainWindow, text="£").grid(row=1, column=0, sticky="E")
                 priceEntry=tkinter.Entry(mainWindow)
-                priceEntry.grid(row=1, column=1)
+                priceEntry.grid(row=1, column=1, sticky="W")
                 button=tkinter.Button(mainWindow, text="Enter", fg="green", font="Helvetica 12", command=lambda:[appendListing(x, priceEntry.get()), tkinterVar.set(1)])
                 button.grid(row=2, columnspan=2)
                 mainWindow.wait_variable(tkinterVar)
@@ -174,4 +183,5 @@ def main(returnCheck=False):
     tkinter.Button(mainWindow, text="Exit Program", fg="red", font="Helvetica 12", command=mainWindow.destroy).grid(row=2, columnspan=2, sticky="NSEW")
     mainWindow.mainloop()
 
-main()
+if __name__=="__main__":
+    main()

@@ -14,9 +14,11 @@ ebayObjects=[]
 fetchedNames=[]
 existingNames=[]
 
-#This defines the class ebayListingItem that is used to represent each ebay listing in order to more easily format the rows when writing to the file.
+#This defines the class ebayListingItem that is used to represent each ebay
+#listing in order to more easily format the rows when writing to the file.
 class ebayListingItem:
-    def __init__(self, name, cost, postage, actual, initStock, inStock, packaging=0.5):
+    def __init__(self, name, cost, postage, actual, initStock, inStock,
+                 packaging=0.5):
         self.name=name
         self.cost=round(float(cost),2)
         self.postage=round(float(postage),2)
@@ -24,7 +26,10 @@ class ebayListingItem:
         self.actual=round(float(actual),2)
         self.ebay=round((int(self.actual*100)*0.11)/100, 2)
         self.paypal=round(float((self.actual/100)*5),2)
-        self.minimum=round(self.ebay+self.paypal+self.cost+self.postage+self.packaging, 2)
+        self.minimum=round(self.ebay+
+                           self.paypal+self.cost+self.postage+
+                           self.packaging, 2)
+
         if int(inStock)>0:
             self.active=True
         self.profit=round(float(self.actual-self.minimum),2)
@@ -32,11 +37,15 @@ class ebayListingItem:
         self.inStock=int(inStock)
         self.soldStock=self.initStock-self.inStock
 
-    #This is a function used purely for testing at the moment, that just prints out all the attributes of any specific listing.
+    #This is a function used purely for testing at the moment, that just prints
+    #out all the attributes of any specific listing.
     def printInfo(self):
-        print(self.name, self.cost, self.postage, self.packaging, self.actual, self.ebay, self.paypal, self.minimum, self.active, self.profit, self.initStock, self.soldStock, self.inStock)
+        print(self.name, self.cost, self.postage, self.packaging, self.actual,
+              self.ebay, self.paypal, self.minimum, self.active, self.profit,
+              self.initStock, self.soldStock, self.inStock)
 
-#This is a function that loads in all the existing data from the file into a list called "existingData".
+#This is a function that loads in all the existing data from the file into a
+#list called "existingData".
 def loadFileData():
     global mainWindow
     mainWindow.destroy()
@@ -56,7 +65,8 @@ def loadFileData():
     #This runs the next function that loads data from the ebay site.
     loadSiteData()
 
-#This is a function that loads all the data from teh listings on the site into a list called "fetchedListings".
+#This is a function that loads all the data from teh listings on the site into
+#a list called "fetchedListings".
 def loadSiteData():
     tradingApi = Trading(config_file = "ebay.yaml", site ="api.sandbox.ebay.com")
 
@@ -67,8 +77,9 @@ def loadSiteData():
 
     results = tradingApi.execute("GetMyeBaySelling", requests)
     for x in results.reply.ActiveList.ItemArray.Item:
-        #print(f'Item name: {x.Title} Item price: £{x.SellingStatus.CurrentPrice.value} Initial Stock: {x.Quantity} Stock Remaining: {x.QuantityAvailable} Sold Stock {int(x.Quantity)-int(x.QuantityAvailable)}')
-        fetchedListings.append([x.Title, x.SellingStatus.CurrentPrice.value, x.Quantity, x.QuantityAvailable, int(x.Quantity)-int(x.QuantityAvailable)])
+        fetchedListings.append([x.Title, x.SellingStatus.CurrentPrice.value,
+                                x.Quantity, x.QuantityAvailable,
+                                int(x.Quantity)-int(x.QuantityAvailable)])
 
     #This tidies up the loaded data and removes any unnecessary parts.
     tidyData()
@@ -94,12 +105,15 @@ def createListingObjects():
     for x in fetchedListings:
         for y in modifiedExistingData:
             if x[0]==y[0]:
-                ebayObjects.append(ebayListingItem(x[0], y[1], 3.70, x[1], initStock=x[2], inStock=x[3]))
+                ebayObjects.append(ebayListingItem(x[0], y[1], 3.70, x[1],
+                                   initStock=x[2], inStock=x[3]))
 
-    #This runs the function that checks for any new products that have been loaded from the website.
+    #This runs the function that checks for any new products that have been
+    #loaded from the website.
     newItemDetection()
 
-#This function writes all the data in rows and columns to the csv file so it can be opened in Excel.
+#This function writes all the data in rows and columns to the csv file so it
+#can be opened in Excel.
 def writeData():
     global ebayObjects
     ebayObjects=sorted(ebayObjects, key= lambda x:x.name)
@@ -112,13 +126,15 @@ def writeData():
             outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, False\n")
     outputFile.close()
 
-#This function is used by the button on the new item detection window, where it fetches the entered cost and also creates a new listing object.
+#This function is used by the button on the new item detection window, where it
+#fetches the entered cost and also creates a new listing object.
 def appendListing(item, value):
     for z in range(len(fetchedListings)):
         if item == fetchedListings[z]:
             position=z
             break
-    ebayObjects.append(ebayListingItem(item, value, 3.70, fetchedListings[z][1], fetchedListings[z][2], fetchedListings[z][3]))
+    ebayObjects.append(ebayListingItem(item, value, 3.70, fetchedListings[z][1],
+                                       fetchedListings[z][2], fetchedListings[z][3]))
 
 
 
@@ -145,22 +161,27 @@ def newItemDetection():
                 tkinterVar = tkinter.BooleanVar(mainWindow, value=False)
                 tkinterVar.set(True)
                 mainWindow.title("NEW ITEM DETECTED!")
-                tkinter.Label(mainWindow, text=f"Please enter the cost of {x}:", font="Helvetica 12").grid(row=0, columnspan=2, sticky="NSEW")
+                tkinter.Label(mainWindow, text=f"Please enter the cost of {x}:",
+                              font="Helvetica 12").grid(row=0, columnspan=2, sticky="NSEW")
                 tkinter.Label(mainWindow, text="£").grid(row=1, column=0, sticky="E")
                 priceEntry=tkinter.Entry(mainWindow)
                 priceEntry.grid(row=1, column=1, sticky="W")
-                button=tkinter.Button(mainWindow, text="Enter", fg="green", font="Helvetica 12", command=lambda:[appendListing(x, priceEntry.get()), tkinterVar.set(1)])
+                button=tkinter.Button(mainWindow, text="Enter", fg="green",
+                                      font="Helvetica 12", command=lambda:[appendListing(x, priceEntry.get()), tkinterVar.set(1)])
                 button.grid(row=2, columnspan=2)
                 mainWindow.wait_variable(tkinterVar)
                 mainWindow.destroy()
             except ValueError:
-                messagebox.showinfo(title="Invalid input", message="The cost cannot be left empty.")
+                messagebox.showinfo(title="Invalid input",
+                                    message="The cost cannot be left empty.")
 
     writeData()
     mainWindow=tkinter.Tk()
     mainWindow.title("Ebay Fetch")
-    tkinter.Label(mainWindow, text="All data has been fetched from the website.", font="Helvetica 12").pack()
-    tkinter.Button(mainWindow, text="Main Menu", fg="red", font="Helvetica 12", command=lambda :main(True)).pack()
+    tkinter.Label(mainWindow, text="All data has been fetched from the website.",
+                  font="Helvetica 12").pack()
+    tkinter.Button(mainWindow, text="Main Menu", fg="red", font="Helvetica 12",
+                   command=lambda :main(True)).pack()
 
 
 
@@ -178,9 +199,12 @@ def main(returnCheck=False):
     for x in range(2):
         mainWindow.columnconfigure(x, weight=1)
 
-    tkinter.Label(mainWindow, text="Welcome to the Ebay Fetch App.", font="Helvetica 12").grid(row=0, columnspan=2, sticky="NSEW")
-    tkinter.Button(mainWindow, text="Fetch Data", fg="green", font="Helvetica 12", command=loadFileData).grid(row=1, columnspan=2, sticky="NSEW")
-    tkinter.Button(mainWindow, text="Exit Program", fg="red", font="Helvetica 12", command=mainWindow.destroy).grid(row=2, columnspan=2, sticky="NSEW")
+    tkinter.Label(mainWindow, text="Welcome to the Ebay Fetch App.",
+                  font="Helvetica 12").grid(row=0, columnspan=2, sticky="NSEW")
+    tkinter.Button(mainWindow, text="Fetch Data", fg="green", font="Helvetica 12",
+                   command=loadFileData).grid(row=1, columnspan=2, sticky="NSEW")
+    tkinter.Button(mainWindow, text="Exit Program", fg="red", font="Helvetica 12",
+                   command=mainWindow.destroy).grid(row=2, columnspan=2, sticky="NSEW")
     mainWindow.mainloop()
 
 if __name__=="__main__":

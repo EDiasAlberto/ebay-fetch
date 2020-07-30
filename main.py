@@ -4,6 +4,7 @@ import tkinter
 import random
 import time
 from tkinter import messagebox
+from tkinter import ttk
 
 
 #This creates a few empty lists that are used for comparisons later on.
@@ -48,11 +49,21 @@ class ebayListingItem:
 #list called "existingData".
 def loadFileData():
     global mainWindow
+    global progressBar
+    global progressLabel
+    global percentageLabel
+
+
     mainWindow.destroy()
     mainWindow=tkinter.Tk()
     mainWindow.title("Ebay Fetch")
     mainWindow.geometry("300x200")
-    tkinter.Label(mainWindow, text="Fetching Data...", font="Helvetica 12").pack()
+    progressLabel=tkinter.Label(mainWindow, text="Fetching Data from file...", font="Helvetica 12")
+    progressBar=ttk.Progressbar(mainWindow, orient="horizontal", length=200, mode="determinate")
+    percentageLabel=tkinter.Label(mainWindow, text="0%", font="Helvetica 12")
+    progressLabel.pack()
+    progressBar.pack()
+    percentageLabel.pack()
 
     #This loads data in from the csv file.
     outputFile=open("outputFile.csv", "r")
@@ -68,6 +79,14 @@ def loadFileData():
 #This is a function that loads all the data from teh listings on the site into
 #a list called "fetchedListings".
 def loadSiteData():
+    global progressBar
+    global progressLabel
+
+    progressLabel.configure(text="Fetching Data from site...")
+    percentageLabel.configure(text="25%")
+    progressBar["value"]=25
+
+    mainWindow.update()
     tradingApi = Trading(config_file = "ebay.yaml", site ="api.sandbox.ebay.com")
 
     requests = {
@@ -87,6 +106,14 @@ def loadSiteData():
 #This is a function that removes all listings that are not in stock.
 #Then it removes all unrelated characters from each listing.
 def tidyData():
+    global progressBar
+    global progressLabel
+
+    progressLabel.configure(text="Tidying up data...")
+    progressBar["value"]=50
+    percentageLabel.configure(text="50%")
+
+    mainWindow.update()
     header=existingData.pop(0)
     for x in existingData:
         if not("n/a" in x):
@@ -102,6 +129,13 @@ def tidyData():
 #This then calculates and creates objects using the class above of each listing.
 #Then it stores them in the list ebayObjects.
 def createListingObjects():
+    global progressBar
+    global progressLabel
+
+    progressLabel.configure(text="Creating Objects...")
+    percentageLabel.configure(text="75%")
+    progressBar["value"]=75
+    mainWindow.update()
     for x in fetchedListings:
         for y in modifiedExistingData:
             if x[0]==y[0]:
@@ -116,6 +150,13 @@ def createListingObjects():
 #can be opened in Excel.
 def writeData():
     global ebayObjects
+    global progressLabel
+
+    progressLabel.configure(text="Writing Data...")
+    percentageLabel.configure(text="100%")
+    progressBar["value"]=100
+    mainWindow.update()
+
     ebayObjects=sorted(ebayObjects, key= lambda x:x.name)
     outputFile=open("outputFile.csv", "w")
     outputFile.write("Name, Cost, Postage, Package, EBay, PayPal, Minimum, Actual, Profit, Initial Stock, Sold Stock, In Stock, Active\n")
@@ -129,6 +170,8 @@ def writeData():
 #This function is used by the button on the new item detection window, where it
 #fetches the entered cost and also creates a new listing object.
 def appendListing(item, value):
+
+
     for z in range(len(fetchedListings)):
         if item == fetchedListings[z]:
             position=z
@@ -146,7 +189,7 @@ def newItemDetection():
     global mainWindow
     global tkinterVar
 
-    mainWindow.destroy()
+
 
     for x in fetchedListings:
         fetchedNames.append(x[0])
@@ -157,25 +200,26 @@ def newItemDetection():
     for x in fetchedNames:
         if x not in existingNames:
             try:
-                mainWindow=tkinter.Tk()
-                tkinterVar = tkinter.BooleanVar(mainWindow, value=False)
+                newItemWindow=tkinter.Tk()
+                tkinterVar = tkinter.BooleanVar(newItemWindow, value=False)
                 tkinterVar.set(True)
-                mainWindow.title("NEW ITEM DETECTED!")
-                tkinter.Label(mainWindow, text=f"Please enter the cost of {x}:",
+                newItemWindow.title("NEW ITEM DETECTED!")
+                tkinter.Label(newItemWindow, text=f"Please enter the cost of {x}:",
                               font="Helvetica 12").grid(row=0, columnspan=2, sticky="NSEW")
-                tkinter.Label(mainWindow, text="£").grid(row=1, column=0, sticky="E")
-                priceEntry=tkinter.Entry(mainWindow)
+                tkinter.Label(newItemWindow, text="£").grid(row=1, column=0, sticky="E")
+                priceEntry=tkinter.Entry(newItemWindow)
                 priceEntry.grid(row=1, column=1, sticky="W")
-                button=tkinter.Button(mainWindow, text="Enter", fg="green",
+                button=tkinter.Button(newItemWindow, text="Enter", fg="green",
                                       font="Helvetica 12", command=lambda:[appendListing(x, priceEntry.get()), tkinterVar.set(1)])
                 button.grid(row=2, columnspan=2)
-                mainWindow.wait_variable(tkinterVar)
-                mainWindow.destroy()
+                newItemWindow.wait_variable(tkinterVar)
+                newItemWindow.destroy()
             except ValueError:
                 messagebox.showinfo(title="Invalid input",
                                     message="The cost cannot be left empty.")
 
     writeData()
+    mainWindow.destroy()
     mainWindow=tkinter.Tk()
     mainWindow.title("Ebay Fetch")
     tkinter.Label(mainWindow, text="All data has been fetched from the website.",
@@ -205,7 +249,8 @@ def main(returnCheck=False):
                    command=loadFileData).grid(row=1, columnspan=2, sticky="NSEW")
     tkinter.Button(mainWindow, text="Exit Program", fg="red", font="Helvetica 12",
                    command=mainWindow.destroy).grid(row=2, columnspan=2, sticky="NSEW")
-    mainWindow.mainloop()
+
 
 if __name__=="__main__":
     main()
+    mainWindow.mainloop()

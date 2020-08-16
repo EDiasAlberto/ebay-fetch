@@ -1,10 +1,7 @@
 #This loads in the trading API for the ebaysdk in order to fetch data from the website.
 from ebaysdk.trading import Connection as Trading
 import tkinter
-import random
-import time
-from tkinter import messagebox
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 
 #This creates a few empty lists that are used for comparisons later on.

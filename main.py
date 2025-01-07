@@ -42,6 +42,11 @@ class ebayListingItem:
               self.ebay, self.paypal, self.minimum, self.active, self.profit,
               self.initStock, self.soldStock, self.inStock)
 
+    def __eq__(self, other):
+        if isinstance(other, ebayListingItem):
+            return self.name == other.name
+        return False
+
 #This is a function that loads in all the existing data from the file into a
 #list called "existingData".
 def loadFileData():
@@ -158,21 +163,14 @@ def writeData():
     outputFile=open("outputFile.csv", "w")
     outputFile.write("Name, Cost, Postage, Package, EBay, PayPal, Minimum, Actual, Profit, Initial Stock, Sold Stock, In Stock, Active\n")
     for x in ebayObjects:
-        if x.initStock>0:
-            outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, True\n")
-        else:
-            outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, False\n")
+        outputFile.write(f"{x.name}, {x.cost}, {x.postage}, {x.packaging}, {x.ebay}, {x.paypal}, {x.minimum}, {x.actual}, {x.profit}, {x.initStock}, {x.soldStock}, {x.inStock}, {x.initStock > 0}")     
     outputFile.close()
 
 #This function is used by the button on the new item detection window, where it
 #fetches the entered cost and also creates a new listing object.
 def appendListing(item, value):
 
-
-    for z in range(len(fetchedListings)):
-        if item == fetchedListings[z]:
-            position=z
-            break
+    z = fetchedListings.index(item)
     ebayObjects.append(ebayListingItem(item, value, 3.70, fetchedListings[z][1],
                                        fetchedListings[z][2], fetchedListings[z][3]))
 
